@@ -122,7 +122,9 @@ Dtan = 67
 
 cEOL = chr(EOL)
 
-#キーワードテーブル
+###############################
+#     キーワードテーブル         #
+###############################
 
 KWTbl =\
     [['while',  While, ''],
@@ -194,3 +196,14 @@ KWTbl =\
      ['dcos',   Dcos,   ''],
      ['dtan',   Dtan,   ''],
     ]
+
+#########################################
+#     関数テーブルFTable[]に格納するクラス   #
+#########################################
+
+class FTableData :
+    def _init_(self,name,line,endLine = -1, fnno = -1, argList = []) :
+        self.name = name
+        self.endLine = endLine
+        self.fnno = fnno
+        self.argList = argList #LTable[]内のインデックスのリスト
