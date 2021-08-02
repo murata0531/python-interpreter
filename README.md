@@ -1,4 +1,4 @@
-# docker-python
+# python-interpreter
 
 コンテナ立ち上げ
 
