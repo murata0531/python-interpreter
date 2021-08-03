@@ -221,3 +221,19 @@ class Stack :
         return self.stack.pop
     def size(self) :
         return len(self.stack)
+
+opstack = stack() # 数式評価用のオペランドスタック
+
+###########################################
+#     文字列の登録を確認する                  #
+###########################################
+
+class Token :
+    def __init__(self,kind,val,name,idx = 0) :
+        #インスタンス変数の提議
+        self.kind = kind # Db1Numなど
+        self.val = val # 45.3など
+        self.name = name # whileなど
+        self.idx = idx #文字列の登録インデックスなど
+    def print(self) :
+        print('kind = {}\nval = {}\nname = {}\nidx = {}\n'.format(self.kind,self.val,self.name,self.idx))
