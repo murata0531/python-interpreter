@@ -237,3 +237,17 @@ class Token :
         self.idx = idx #文字列の登録インデックスなど
     def print(self) :
         print('kind = {}\nval = {}\nname = {}\nidx = {}\n'.format(self.kind,self.val,self.name,self.idx))
+
+############################################
+#       変数の登録リストに入れるクラス          #
+############################################
+
+class Var :
+    def __init__(self,name,fnno,len,dmmaddr,val,line,idx) :
+        self.name = name
+        self.fnno = fnno
+        self.len = len
+        self.dmmaddr = dmmaddr
+        self.val = val
+        self.line = line
+        self.idx = idx
