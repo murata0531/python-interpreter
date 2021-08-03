@@ -202,8 +202,22 @@ KWTbl =\
 #########################################
 
 class FTableData :
-    def _init_(self,name,line,endLine = -1, fnno = -1, argList = []) :
+    def __init__(self,name,line,endLine = -1, fnno = -1, argList = []) :
         self.name = name
         self.endLine = endLine
         self.fnno = fnno
         self.argList = argList #LTable[]内のインデックスのリスト
+
+##########################################
+# push(),pop()を使えるようにしたクラス       #
+##########################################
+
+class Stack :
+    def __init__(self) :
+        self.stack = []
+    def push(self,x) :
+        self.stack.append(x)
+    def pop(self) :
+        return self.stack.pop
+    def size(self) :
+        return len(self.stack)
