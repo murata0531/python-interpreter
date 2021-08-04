@@ -63,7 +63,7 @@ Mult = 8
 Div = 9
 Assign = 10
 Comma = 11
-Db1Q = 12
+DblQ = 12
 Dot = 13
 Equal = 14
 NotEq = 15
@@ -81,13 +81,13 @@ RBracket = 26
 Mod = 27
 Doll = 28
 Under = 29
-Sg1Q = 30
+SglQ = 30
 Comment = 31
 PlusEq = 32
 MinusEq = 33
 MultEq = 34
 DivEq = 35
-Db1Num = 36
+DblNum = 36
 Str = 37
 Digit = 38
 Letter = 39
@@ -231,7 +231,7 @@ opstack = stack() # 数式評価用のオペランドスタック
 class Token :
     def __init__(self,kind,val,name,idx = 0) :
         #インスタンス変数の提議
-        self.kind = kind # Db1Numなど
+        self.kind = kind # DblNumなど
         self.val = val # 45.3など
         self.name = name # whileなど
         self.idx = idx #文字列の登録インデックスなど
@@ -251,3 +251,19 @@ class Var :
         self.val = val
         self.line = line
         self.idx = idx
+
+######################################################
+#       文字列でソースを行に分割し、sourceCodeへ入れる     #
+#       CR,LFなどOSにより違う                          #
+#       空行は#のみの行として扱う                        #
+######################################################
+
+def getLines(splt) :
+    global sourceCode
+    wk = source.split(splt)
+    for i in range(len(wk)) :
+        wk[i] = wk[i].lstrip() #文字列の左の空白を削除
+        if len(wk[i]) == 0 :
+            wk[i] = '#' #空白はコメント行として扱う
+        wk[i] += cEOL
+    sourceCode = wk
