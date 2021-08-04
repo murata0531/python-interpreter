@@ -277,3 +277,42 @@ def readSource(fname) :
     s = f.read()
     f.close()
     return s
+
+##############################################################
+#          fnnoList[]に各行の fnno を入れる                    #
+#          ソースの先頭から、見つかった関数に番号（fnno）をつける    #
+#          関数に属していない行はfnno = 0                       #
+##############################################################
+
+def getFnnoList() :
+    global fnnoList, _lpt, funcAddrList, FTable1
+    FTable1.clear()
+    fnnoList.clear()
+    funcAddrList = []
+    stk = Stack()
+    for line in range(len(sourceCode)) :
+        _lpt = 0
+        tkn = getToken1(line)
+        kd = tkn.kind
+        if kd == Func or kd == If or kd == For or kd == While :
+            stk.push([kd, line]) 
+            if kd == Func :
+                tkn = getToken1(line) #関数名も取得しておく
+                for i in range(len(FTable1)): #同じ関数名があればエラー
+                    if FTable1[i][1] == tkn.val :
+                        raise Exception(errmsg0 + str(line + 1))
+                FTable1.append([line, tkn.val])
+        elif kd == End :
+            x = stk.pop()
+            if x[0] == Func :
+                funcAddrList.append([x[1], line]) #定義開始、終了行
+    for i in range(len(sourceCode)) :
+        fnnoList.append(0)
+    #ソースの各行がどの関数に属しているかfnnoを記録
+    k = 1
+    for i in range(len(funcAddrList)) :
+        [x, y] = funcAddrList[i]
+        for j in range(x, y + 1) :
+            fnnoList[j] = k
+        k = k + 1
+    return
