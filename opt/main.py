@@ -380,3 +380,33 @@ def getToken1(line) :
     if c == cEOL :
         return None
     raise Exception(errmsg0 + str(line + 1)) #トークンを判断できなかった
+
+#################################################################################
+#              dimの処理専用（配列登録用）                                          #
+#              _lpt（行内のポインタ位置)から1個トークン(文字か文字列か数値)を取得         #
+#              13,DblNum などのペアを返す                                          #
+#################################################################################
+
+def getToken2(line) :
+    global _sline
+    _sline = line
+    skipSpaceLine()
+    c = getc()
+    s = c
+    #DblNum1文字目
+    if ('0' <= c and c <= '9') or c == '.' : 
+        x = numVal(c)
+        return x, DblNum
+    #Ident1文字目
+    elif ('A' <= c and c <= 'Z') \
+                or ('a' <= c and c <= 'z') or c == '_' or c == '$' :
+        #'$'はグローバル変数名の先頭
+        s = getIdent(c)
+        if c != '$' : #Identのうち、ローカル変数名
+            raise Exception(errmsg0 + str(line + 1))
+        return s, Gvar
+    elif c == '[' or c == ']'or c == ',' :
+        return c, 0
+    elif c == cEOL :
+        return None, 0
+    raise Exception(errmsg0 + str(line + 1)) #トークンを判断できなかった
