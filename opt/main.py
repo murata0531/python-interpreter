@@ -267,3 +267,13 @@ def getLines(splt) :
             wk[i] = '#' #空白はコメント行として扱う
         wk[i] += cEOL
     sourceCode = wk
+
+######################################################
+#           ソースを一括リード                          #
+######################################################
+
+def readSource(fname) :
+    f = codecs.open(fname,'r','utf-8')
+    s = f.read()
+    f.close()
+    return s
