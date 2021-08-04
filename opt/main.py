@@ -316,3 +316,67 @@ def getFnnoList() :
             fnnoList[j] = k
         k = k + 1
     return
+
+########################################################
+#           次のトークンを取得し、sと一致しているか確認       #
+#           一致しなければ例外を発生させる                  #
+########################################################
+
+def nextTkn(line, s) :
+    x, y = getToken2(line)
+    if x != s :
+        raise Exception(errmsg0 + str(line + 1))
+
+##########################################################
+#           _lpt（行内のポインタ位置)から1個、トークンを取得    #
+##########################################################
+
+def getToken1(line) :
+    global _sline
+    _sline = line
+    skipSpaceLine()
+    c = getc()
+    s = c
+    #DblNum1文字目
+    if ('0' <= c and c <= '9') or c == '.' : 
+        x = numVal(c)
+        registVal(Token(DblNum, x, '')) #kind, val, name
+        return Token(DblNum, x, '') #読み取ったトークンを返す。数値を表すトークン。
+    #ローカル変数、グローバル変数、関数名の1文字目
+    if ('A' <= c and c <= 'Z') \
+                or ('a' <= c and c <= 'z') or c == '_' or c == '$' :
+         #'$'はグローバル変数名の先頭
+        s = getIdent(c)
+        idx = getKwtblIndex(s)
+        if idx >= 0 : #予約語なら
+            return Token(KWTbl[idx][1], KWTbl[idx][0], '')
+        elif c != '$' :#ローカル変数名か関数名
+            return Token(Lvar, s, '') #予約語でないIdent   
+        else : #'$'で始まる(グローバル変数名)
+            for i in range(len(DTable)):
+                if DTable[i].name == s : #配列変数名だった
+                    return Token(Dvar, s, '', i) #インデックスiも返す
+            registGvar(Token(Gvar, s, ''), line)
+            return Token(Gvar, s, '') #予約語でないIdent   
+    #+, - や += , == など
+    if c == '+' or c == '-' or c == '='\
+               or c == '!' or c == '>' or c == '<' :
+        s = getOp1(c) #cで始まるトークンの文字列を取得
+        idx = getKwtblIndex(s) #sからキーワードテーブル(KWTble)のインデックスを得る
+        return Token(KWTbl[idx][1], KWTbl[idx][0], '')
+    elif c == '*' or c == '/': # **,//
+        s = getOp2(c)
+        idx = getKwtblIndex(s)
+        return Token(KWTbl[idx][1], KWTbl[idx][0], '')
+    #1文字でトークン確定
+    if c == '"' or c == '(' or c == ')' or c == ','\
+                or c == '[' or c == ']'or c == '#' or c == '%' :
+        s = c
+        idx = getKwtblIndex(s)
+        if c == '"' : #ダブルクォーテーションなら
+            idx = registStr() #STableに登録したインデックスが返る
+            return Token(Str, '', '', idx)            
+        return Token(KWTbl[idx][1], KWTbl[idx][0], '')
+    if c == cEOL :
+        return None
+    raise Exception(errmsg0 + str(line + 1)) #トークンを判断できなかった
