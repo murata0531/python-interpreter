@@ -434,8 +434,28 @@ def skipSpaceLine() :
 #         ポインタは行内で動くだけ、_slineは動かさない                # 
 #################################################################
 
-def getc():
+def getc() :
     global _lpt
     c = sourceCode[_sline][_lpt]
     _lpt += 1
     return c
+
+#################################################################
+#          先頭が文字cの数値を1個sourceCodeから得る                  #
+#          _lpt はその数値の末位の次の桁を指した状態で返る             #
+#################################################################
+
+def numVal(c) :
+    global _lpt
+    s = ''
+    ct = 0
+    while ('0' <= c and c <= '9') or c == '.' :
+        if c == '.' :
+            ct += 1
+            if ct >= 2 : #カンマが2つ以上あればエラー
+                raise Exception(errmsg0 + str(_sline + 1))
+        s += c
+        c = getc()
+    #0～9か.以外の文字が出てきたらここへ来る
+    _lpt -= 1
+    return float(s)
