@@ -528,3 +528,56 @@ def toInterCode1(line) :
         ret, tkn = toInterCode0(line)
         if ret == True :
             break #1行終わった
+
+##########################################################
+#     ソースコードを中間コードに変換                          #
+#     1回のコールでトークン1個分を中間コードに変換              #
+#     SourceCode[line]からInterCode[line]へ           　  #
+#     while → While, 終了行 や　関数名 → Func, 変数名　など 　#
+#　　　InterCodeは各行とも最後にcEOL(行末のマーク)は入れない    #
+#     戻り値が False ならその行にはまだトークンが続く         　#
+##########################################################
+
+def toInterCode0(line) :
+    tkn = getToken1(line)
+    if tkn == None : #cEOL(行の最後)だったら
+        return True, tkn
+    kd = tkn.kind
+    addCode(line, kd) #Lvar, DblNumなどをInterCodeへappend
+    if kd == While or kd == If or kd == Elif or kd == Else or kd == For :
+        #あとでここにendの存在する番地などを入れるため、空けておく
+        addCode(line, 123456) #パディング
+        if kd == If or kd == Elif or kd == Else : #if, elif, else では2回パディング
+            addCode(line, 7890) #パディング
+    elif kd == Lvar :
+        for i in range(len(FTable1)) : #FTable1[]は予め調べておいた関数名のリスト
+            if FTable1[i][1] == tkn.val : #関数名だったら
+                InterCode[line][-1] = Fcall #関数呼び出しに書き直す
+                addCode(line, i) #Fcallのすぐ後には関数のインデックスを格納
+                return False, tkn
+        #Var  name, fnno, len, dmmaddr, val, line, idx
+        v = Var(tkn.val, fnnoList[line], 1, -1, -1, line, -1)
+        j = registLvar(v) #関数の引数以外のローカル変数を登録
+        addCode(line, j)
+    elif kd == Gvar :
+        tkn.kind = Gvar
+        j = registGvar(tkn, line) #すでに登録済みの変数だが、jを得るためにコール
+        addCode(line, j) #GTable[j]の変数であることをInterCodeに記録
+    elif kd == Dvar :
+        tkn.kind = Dvar
+        addCode(line, tkn.idx) #この配列変数はDTable[tkn.idx]に登録してある
+    elif kd == DblNum :
+        tkn.kind = DblNum
+        j = registVal(tkn) #すでに登録済みの変数だが、jを得るため
+        addCode(line, j) #VTable[j]の変数であることをInterCodeに記録
+    elif kd == Str :
+        addCode(line, tkn.idx) #STable内のindexを中間コードとする
+    elif kd == Break :
+        addCode(line, 2222) #パディング。Breakの次にbreak実行後の飛先を入れるため。
+    elif kd == Func :
+        registFunc(line)
+    elif kd == Comment : #「#」より後ろの部分は中間コードにしない
+        return True, tkn
+    elif kd == Dim : #dimより後ろの部分は中間コードにしない
+        return True, tkn
+    return False, tkn #False……続きがある
