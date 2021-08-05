@@ -500,3 +500,31 @@ def getKwtblIndex(s) :
         if KWTbl[i][0] == s :
             return i
     return -1
+
+###############################################
+#      InterCode[line]に「n」を追加             #
+###############################################
+
+def addCode(line, n) :
+    InterCode[line].append(float(n))
+
+################################################
+#      sourceCodeからInterCodeへ変換             #
+################################################
+
+def toInterCode():
+    for i in range(len(sourceCode)) :
+        toInterCode1(i)
+
+################################################
+#      sourceCodeからInterCodeへ1行分変換        #
+################################################
+
+def toInterCode1(line) :
+    global _lpt
+    InterCode.append([]) #新しい行のためのリスト
+    _lpt  = 0
+    while True :
+        ret, tkn = toInterCode0(line)
+        if ret == True :
+            break #1行終わった
