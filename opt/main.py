@@ -410,3 +410,21 @@ def getToken2(line) :
     elif c == cEOL :
         return None, 0
     raise Exception(errmsg0 + str(line + 1)) #トークンを判断できなかった
+
+################################################################
+#        Tokenのインスタンス変数   kind, val, name, idx           #
+#        KWTbl[idx][1] = 'while', KWTbl[idx][0] = While など    #
+#--------------------------------------------------------------#
+#sourceCodeの現在の行内で、_lpt位置からスペースをスキップ             #
+################################################################
+
+def skipSpaceLine() :
+    global _lpt
+    c = getc()
+    if c != ' ' :
+        _lpt -= 1
+        return
+    while c == ' ' :
+        c = getc()
+    _lpt -= 1
+    return
