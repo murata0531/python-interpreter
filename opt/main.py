@@ -598,3 +598,18 @@ def registStr() :
             return i
     STable.append(s)
     return len(STable) - 1 #indexを返す
+
+##########################################################
+#     数値の登録 トークンを保存する                  　       #
+#     VTableに登録後、保存位置（VTableのインデックス）を返す    #
+#     登録済みだったらインデックスだけ求めてそれを返す           #
+##########################################################
+
+def registVal(tkn) :
+    global VTable
+    for i in range(len(VTable)) :
+        if VTable[i].val == tkn.val :
+            return i #登録済みだった
+    VTable.append(tkn)
+    j = len(VTable) - 1 #今、追加したデータのインデックス
+    return j #登録した    
