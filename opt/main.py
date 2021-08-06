@@ -581,3 +581,20 @@ def toInterCode0(line) :
     elif kd == Dim : #dimより後ろの部分は中間コードにしない
         return True, tkn
     return False, tkn #False……続きがある
+
+###########################################################
+#     STableに登録後、保存位置（STableのインデックス）を返す     #
+#     登録済みだったらインデックスだけ求めて返す                 #
+###########################################################
+
+def registStr() :
+    s = ''
+    c = getc()
+    while c != '"' and c != cEOL :
+        s += c
+        c = getc()
+    for i in range(len(STable)) :
+        if STable[i] == s :
+            return i
+    STable.append(s)
+    return len(STable) - 1 #indexを返す
