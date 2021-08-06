@@ -613,3 +613,21 @@ def registVal(tkn) :
     VTable.append(tkn)
     j = len(VTable) - 1 #今、追加したデータのインデックス
     return j #登録した    
+
+###########################################################
+#    グローバル変数の登録                                   　#
+#    GTableに登録後、変数の保存位置（GTableのインデックス）を返す　#
+#    登録済みの変数だったらインデックスだけ求めてそれを返す    　 　#
+###########################################################
+
+def registGvar(tkn, line) :
+    global GTable, GVARSIZE
+    for i in range(len(GTable)) :
+        if GTable[i].name == tkn.val :
+            return i #登録済みだった
+    v = Var(tkn.val, 0, 1, 0, 0, 0, 0) #name, fnno, len, dmmaddr, val, line, idx
+    GTable.append(v)
+    j = len(GTable) - 1
+    GTable[j].dmmaddr = GVARSIZE #ここまでのGvarの個数の計
+    GVARSIZE += v.len #更新
+    return j #登録した    
