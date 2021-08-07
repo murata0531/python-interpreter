@@ -630,4 +630,20 @@ def registGvar(tkn, line) :
     j = len(GTable) - 1
     GTable[j].dmmaddr = GVARSIZE #ここまでのGvarの個数の計
     GVARSIZE += v.len #更新
+    return j #登録した
+
+####################################################################
+#     ローカル変数の登録                                              #
+#     LTable内の変数の保存位置を返す                                   #
+#     LTableに登録後、変数の保存位置（LTableのインデックス）を返す         #
+#     登録済みの変数だったらインデックスを求めて返す                       #
+####################################################################
+
+def registLvar(v) :
+    global LTable
+    for i in range(len(LTable)) :
+        if LTable[i].name == v.name and LTable[i].fnno == v.fnno :
+            return i #登録済みだった
+    LTable.append(v)
+    j = len(LTable)-1 #今、追加した変数のインデックス
     return j #登録した    
