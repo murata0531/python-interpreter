@@ -703,3 +703,60 @@ def registDvar1(line) :
         elif c != ',' :
             raise Exception(errmsg0 + str(line + 1))
         #カンマだった
+
+################################################################################
+#    Func f1(x, y)の行の処理                                 　                  #
+#    関数名、引数などを FTable[] に登録する                                       　#
+#    Func を読み終わった状態でコールする                                            #
+#    Funcの後に2データ(関数の終了行、FTable[]内のインデックス)、InterCodeに記録済み     #
+#    関数の番号 fnno はFTable[]のインデックスとは異なる                              #
+#    fnnoは定義された順に1,2,3,……。と連番を振る                                     #
+#    class FTableData:                                                         #
+#    def __init__(self, name, line, endLine = -1, fnno = -1, argList = []):    #
+################################################################################
+
+def registFunc(line) :
+    argList = [] #関数の引数リスト。LTable[]のインデックスを入れる。FTable[]に格納。
+    tkn = getToken1(line) #関数名
+    fname = tkn.val #'f1'など
+    endLine = searchFuncAddr(line)
+    if endLine == -1 :
+        raise Exception(errmsg0 + str(line + 1))
+    addCode(line, endLine) #Funcのすぐ後に対応するendのアドレスを入れる
+    addCode(line, 4444) #定義された関数のインデックスを後で入れるため。
+    fdata = FTableData(fname, line, endLine, fnnoList[line]) #クラスに値をセット
+    #name, line, endLine = -1, fnno = -1, argList = []
+    if not checkCode(line, LParen): #次のトークンが LParen であることを確認
+        raise Exception(errmsg0 + str(line + 1))
+    addCode(line, LParen)
+    tkn = getToken1(line)
+    if tkn.kind == RParen:
+        addCode(line, RParen) #変数なし、右括弧で終わり
+        #変数なしの関数の登録
+        fdata.argList = argList
+        FTable.append(fdata) #関数の登録
+        return True
+    #')'でなかった
+    while True:
+        if tkn.kind != Lvar : #それはLvarでなければ
+            raise Exception(errmsg0 + str(line + 1))
+        #tknはローカル変数だった
+        addCode(line, Lvar)
+        #Var  name, fnno, len, dmmaddr, val, line, idx
+        v = Var(tkn.val, fnnoList[line], 1, -1, -1, line, -1)
+        j = registLvar(v) #LTable[j]に関数の引数であるローカル変数が格納される
+        argList.append(j)
+        addCode(line, j) #InterCodeのLvarの次にjを格納
+        tkn = getToken1(line)
+        if tkn == None:
+            raise Exception(errmsg0 + str(line + 1))
+        if tkn.kind == RParen: #右括弧なら無事終わり
+            addCode(line, RParen)
+            fdata.argList = argList
+            FTable.append(fdata) #関数の登録
+            InterCode[line][2] = len(FTable) - 1 #関数はFTable内のここへ登録された
+            return True
+        elif tkn.kind != Comma: #それはコンマでなければ終わり
+            raise Exception(errmsg0 + str(line + 1))
+        addCode(line, Comma)
+        tkn = getToken1(line)
