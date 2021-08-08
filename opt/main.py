@@ -646,4 +646,60 @@ def registLvar(v) :
             return i #登録済みだった
     LTable.append(v)
     j = len(LTable)-1 #今、追加した変数のインデックス
-    return j #登録した    
+    return j #登録した
+
+###################################################################
+#     配列変数の登録                                          　　   #
+#     エラーなら例外発生                                     　　     #
+#                                                                 #
+#     dim $a[10], $bbb[30], $cc[15]　のよう1行にまとめて書いてもよい  　#
+#     kind, val, name, idx                                        #
+###################################################################
+
+def registDvar() :
+    global DTable, _sline, _lpt
+    _sline = 0
+    for line in range(len(sourceCode)) :
+        _lpt = 0
+        tkn = getToken1(line)
+        if tkn.kind == Dim :
+            registDvar1(line)
+
+###########################################################
+#     配列変数の登録                               　      　#
+#     dimを読んでからここへ来る                          　   #
+#     エラーなら例外発生                                     #
+#                                                      　 #
+#     dim $a[10], $bbb[30], $cc[15]   　　　   　          #
+#     kind, val, name, idx             　 　　 　      　   #
+###########################################################
+
+def registDvar1(line) :
+    global DTable, _lpt, DArray
+    while True :
+        varname, kind = getToken2(line) #グローバル変数名
+        if kind != Gvar :
+            raise Exception(errmsg0 + str(line + 1))
+        nextTkn(line, '[') #'['のはず
+        varsize, kind = getToken2(line)  #配列のサイズ（数値）
+        if kind != DblNum :
+            raise Exception(errmsg0 + str(line + 1))
+        nextTkn(line, ']') #']'のはず
+        for i in range(len(DTable)) :
+            if DTable[i].name == varname: #既に登録されている変数名ならエラー
+                raise Exception(errmsg0 + str(line + 1))
+        v = Var(varname, fnnoList[line], varsize, 0, 0, line, len(DTable))
+        #name, fnno, len, dmmaddr, val, line, idx
+        DTable.append(v)
+        #配列の領域確保
+        lst = [] #126
+        for i in range(int(varsize)) :
+            lst.append(0)
+        DArray.append(lst)
+        c, d = getToken2(line)
+        if c == None :
+            _lpt -= 1
+            return #無事、配列の定義が終了
+        elif c != ',' :
+            raise Exception(errmsg0 + str(line + 1))
+        #カンマだった
