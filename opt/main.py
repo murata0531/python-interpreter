@@ -767,6 +767,28 @@ def registFunc(line) :
 
 def checkCode(line, kd) :
     tkn = getToken1(line)
-    if tkn.kind == kd:
+    if tkn.kind == kd :
         return True
     return False
+
+############################################################################
+#    line 行目で定義されている関数の引数のリストを得る                          　 #
+#   （LTable[]内のインデックスのリスト）                                      　#
+#    関数名は最初に中間コード生成時に Lvar, idx とされている               　   　 #
+#    中間コードは                                                            #
+#     Func, _, _, Lvar, idx, LParen, Lvar, _, Comma, Lvar, _, Comma, ……    #
+#    という並びになっている                                                    #
+#    Lvar, idx は以降では使わないが、詰めずに放っておく                           #
+#    関数の引数は 行の先頭 +6 から 引数がなければ +6 にはRParenがある              #
+############################################################################
+
+def getArgList(line) :
+    ret = []
+    if lookIc(line, 6) == RParen :
+        return []
+    ret.append(lookIc(line, 7)) #Lvar のLTable[]内でのインデックス
+    i = 8
+    while lookIc(line, i) != RParen :
+        ret.append(lookIc(line, i + 2)) #Lvar のLTable[]内でのインデックス
+        i = i + 3
+    return ret
