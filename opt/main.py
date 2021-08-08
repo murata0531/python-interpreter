@@ -760,3 +760,13 @@ def registFunc(line) :
             raise Exception(errmsg0 + str(line + 1))
         addCode(line, Comma)
         tkn = getToken1(line)
+
+#########################################################
+#   次のトークンの kind（While, For など） が kd ならTrue    #
+#########################################################
+
+def checkCode(line, kd) :
+    tkn = getToken1(line)
+    if tkn.kind == kd:
+        return True
+    return False
