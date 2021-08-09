@@ -792,3 +792,31 @@ def getArgList(line) :
         ret.append(lookIc(line, i + 2)) #Lvar のLTable[]内でのインデックス
         i = i + 3
     return ret
+
+###############################################################################
+#　　各関数内のローカル変数（引数を含む）のサイズ計をlocalVarSize[]に求める             #
+#　　関数番号は関数でない部分が fnno = 0、他は定義されている順に 1,2,3,……              #
+#　　localVarSize[0]にはどの関数にも属していない(fnno = 0)ローカル変数の数、          #
+#　　localVarSize[1]には fnno = 1 の関数にも属しているローカル変数の数、             #
+#　　localVarSize[2]には fnno = 2 の関数にも属しているローカル変数の数、             #
+#　　LTable[i].dmmaddr には LTable[i - 1] までの変数の数が入る                    #
+#　　LTable[i].len にはその変数の個数が入っている 単純な変数なら1（配列ならその個数）    #
+#   (Dmem[GVARSIZE + dmmaddr + baseReg] に LTable[i] の変数の値が入る)          #
+#   配列でないなら、変数ｘの値が入る                                              #
+#　（配列ならここから順にx[0], x[1], x[2], ……が入る）                             #
+##############################################################################
+
+def getLocalVarSize() :
+    global localVarSize
+    fnnoMax = 0
+    localVarSize = []
+    for i in range(len(LTable)) : #最大のfnnoを求める
+        if LTable[i].fnno > fnnoMax :
+            fnnoMax = LTable[i].fnno
+    for i in range(fnnoMax + 1) :
+        localVarSize.append(0) #関数の個数分、初期化
+    for i in range(len(LTable)) :
+        ln = LTable[i].len
+        fnno = LTable[i].fnno
+        LTable[i].dmmaddr = localVarSize[fnno]
+        localVarSize[fnno] = localVarSize[fnno] + ln
