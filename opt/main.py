@@ -820,3 +820,15 @@ def getLocalVarSize() :
         fnno = LTable[i].fnno
         LTable[i].dmmaddr = localVarSize[fnno]
         localVarSize[fnno] = localVarSize[fnno] + ln
+
+#########################################
+#   関数の開始行を与えて終了行を求める      　#
+#   funcAddrListの[start, ＿]を探す     　#
+#########################################
+
+def searchFuncAddr(start) :
+    for i in range(len(funcAddrList)) :
+        x = funcAddrList[i]
+        if x[0] == start :
+            return x[1]
+    return -1
