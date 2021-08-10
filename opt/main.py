@@ -832,3 +832,21 @@ def searchFuncAddr(start) :
         if x[0] == start :
             return x[1]
     return -1
+
+###########################################################################
+#   InterCodeを走査して、while, for, if, elif, elseの次に必要なアドレスを入れる  #
+###########################################################################
+
+def setStartEndAddr() :
+    stk = Stack()
+    for i in range(len(InterCode)) :
+        cm = InterCode[i][0]
+        if cm == While or cm == For or cm == If or cm == Func :
+            stk.push(i) #行番号をプッシュ
+        elif cm == Elif or cm == Else :
+            j = stk.pop()
+            InterCode[j][1] = i
+            stk.push(i)
+        elif cm == End :
+            j = stk.pop()
+            InterCode[j][1] = i
