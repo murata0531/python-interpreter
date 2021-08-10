@@ -850,3 +850,57 @@ def setStartEndAddr() :
         elif cm == End :
             j = stk.pop()
             InterCode[j][1] = i
+
+
+def setIfAddr1(i) :
+    ln = i
+    while InterCode[ln][0] != End :
+        ln = InterCode[ln][1]
+    endAddr = ln #ここまで来たらlnはEndのアドレス
+    ln = i
+    while InterCode[ln][0] != End :
+        #if, elif, else の行にendのアドレスを埋め込む
+        InterCode[ln][2] = endAddr
+        ln = InterCode[ln][1] #次のelif, else, endのアドレス
+
+#if, elif, else の後にジャンプ先アドレスを埋め込む
+def setIfAddr() :
+    for i in range(len(InterCode)) :
+        cm = InterCode[i][0]
+        if cm == If :
+            setIfAddr1(i)
+
+def setBreakAddr() :
+    global breakList
+    breakList = []
+    i = 0
+    while i < len(InterCode) :
+        ic = lookIc(i, 0)
+        if ic == While or ic == For :
+            i = setBreakAddr1(i)
+        i += 1
+
+######################################################################
+#   Breakの次にそのbreak文が含まれるwhileブロックなどのendの行番号を書き込む  #
+#   lineは見つかったwhile, forの行番号                                  #
+#   最初のwhileやforに対応するendの行番号が返る                           #
+######################################################################
+
+def setBreakAddr1(line) :
+    global breakList
+    stk = Stack()
+    i = line + 1
+    while True :
+        ic = lookIc(i, 0)
+        if ic == While or ic == For :
+            i = setBreakAddr1(i)
+        elif ic == Break :
+            stk.push(i) #breakの行番号をプッシュ
+            breakList.append(i)
+        elif ic == End and not (i in ifEndList) :
+        #ifに対応するend以外のendなら
+            for j in range(stk.size()) :
+                #endの行番号をbreakの後ろに書き込み
+                InterCode[stk.pop()][1] = i
+            return i #end文の行番号を返す
+        i += 1
