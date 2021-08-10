@@ -934,3 +934,32 @@ def posChk() :
         elif ic == Elif or ic == Else or ic == End :
             raise Exception(errmsg0 + str(_line + 1))
         _line += 1
+
+##########################
+#   ifを読んだらコールする 　#
+##########################
+
+def chkIfBlock() :
+    global _line, ifEndList
+    elseFlag = 0
+    ln = _line
+    _line += 1
+    while _line < len(InterCode) :
+        ic = InterCode[_line][0]
+        if ic == While or ic == For :
+            chkBlock()
+        elif ic == If:
+            chkIfBlock()
+        elif ic == Else or ic == Elif :
+            if elseFlag == 1:
+                raise Exception(errmsg0 + str(_line + 1))
+            if ic == Else:
+                elseFlag = 1
+        elif ic == Func:
+            raise Exception(errmsg0 + str(_line + 1))
+        elif ic == End: #if文に対応するend文
+            ifEndList.append(_line) #end文の行番号を追加
+            return
+        _line += 1
+    #endがないときここへ来る
+    raise Exception(errmsg0 + str(ln + 1))
