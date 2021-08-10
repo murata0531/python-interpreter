@@ -904,3 +904,33 @@ def setBreakAddr1(line) :
                 InterCode[stk.pop()][1] = i
             return i #end文の行番号を返す
         i += 1
+
+############################################
+#   return, break文の位置が正しいかチェック  　#
+###########################################
+
+def returnBreakChk() :
+    for i in range(len(InterCode)) :
+        ic = lookIc(i, 0)
+        if ic == Return : #どれかの関数内にあるならok
+            if fnnoList[i] == 0 :
+                raise Exception(errmsg0 + str(i + 1))
+        elif ic == Break :
+            if i not in breakList :
+                raise Exception(errmsg0 + str(i + 1))
+
+def posChk() :
+    global _line, ifEndList
+    _line = 0
+    ifEndList = []
+    while _line < len(InterCode) :
+        ic = InterCode[_line][0]
+        if ic == While or ic == For :
+            chkBlock()
+        elif ic == Func :
+            chkFuncBlock()
+        elif ic == If :
+            chkIfBlock()
+        elif ic == Elif or ic == Else or ic == End :
+            raise Exception(errmsg0 + str(_line + 1))
+        _line += 1
