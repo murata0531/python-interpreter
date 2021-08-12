@@ -1005,3 +1005,50 @@ def chkFuncBlock() :
             raise Exception(errmsg0 + str(_line + 1))
         _line += 1
     raise Exception(errmsg0 + str(ln + 1))
+
+#######################################
+#    DblNum は読んである状態でコール      #
+#######################################
+
+def pushVal() : #変数から値を取り出してプッシュ
+    no = nextic()
+    v = VTable[no].val
+    opstack.push(v)
+    return
+
+#####################################
+#    行内のポインタを1だけ戻す     #
+#####################################
+
+def backlpt1() :
+    global _lpt
+    _lpt -= 1
+    return
+
+#######################################################
+#   _lptが中間コードの対象の行の最後に達していなければ1戻す 　 #
+#   最後に達したら戻さない                                #
+#######################################################
+
+def backlpt() :
+    global _lpt
+    if _lpt < len(InterCode[_line]) :
+        _lpt -= 1
+    return
+
+#############################
+#   _line, _lpt をセット     #
+#############################
+
+def setlpt2(line, lpt) :
+    global _line, _lpt
+    _line = line
+    _lpt = lpt
+    return
+
+#####################
+#   _line を1進める  #
+#####################
+
+def incLine() :
+    setlpt2(_line + 1, 0)
