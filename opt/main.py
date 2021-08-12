@@ -984,3 +984,24 @@ def chkBlock() :
             raise Exception(errmsg0 + str(_line + 1))
         _line += 1
     raise Exception(errmsg0 + str(ln + 1))
+
+#######################################
+#       funcを読んだらコールする         #
+#######################################
+
+def chkFuncBlock() :
+    global _line
+    ln = _line
+    _line += 1
+    while _line < len(InterCode) :
+        ic = InterCode[_line][0]
+        if ic == While or ic == For :
+            chkBlock()
+        elif ic == If:
+            chkIfBlock()
+        elif ic == End :
+            return
+        elif ic == Elif or ic == Else or ic == Func:
+            raise Exception(errmsg0 + str(_line + 1))
+        _line += 1
+    raise Exception(errmsg0 + str(ln + 1))
