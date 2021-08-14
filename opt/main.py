@@ -1052,3 +1052,29 @@ def setlpt2(line, lpt) :
 
 def incLine() :
     setlpt2(_line + 1, 0)
+
+#---------------------------
+#次の中間コードを得る
+#行の最後に到達していたら -1 が返る
+#
+def nextic():
+    global _lpt
+    if _lpt >= len(InterCode[_line]):
+        return -1
+    ic = InterCode[_line][_lpt]
+    _lpt += 1
+    return int(ic)
+#---------------------------
+#次の中間コードが ic であることを確認。一致すれば True。
+#
+def checkic(ic):
+    if nextic() == ic:
+        return True
+    return False
+
+#############################
+#    InterCode[i][j]を得る   #
+#############################
+
+def lookIc(i, j) :
+    return InterCode[i][j]
