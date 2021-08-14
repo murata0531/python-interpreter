@@ -1078,3 +1078,128 @@ def checkic(ic):
 
 def lookIc(i, j) :
     return InterCode[i][j]
+
+#############################################
+#   !, +, - (ファクターの前につく記号)は最優先   #
+#   例 ) !8 + 9 = 10                        #
+#   factorを評価してopstakにプッシュ           #
+#   文法チェック中には1がプッシュされて返る       #
+#   _chkMode = 1 のときは文法チェック中        #
+#   _chkMode = 0 のときは通常の実行中          #
+#############################################
+
+def factor():
+    if _chkMode == 1:
+    #■■■このブロックは文法チェック中に実行される
+        ic = nextic()
+        if ic == -1: #行末だったらエラー
+            raise Exception(errmsg0 + str(_line + 1))
+        elif ic == Not or ic == Plus or ic == Minus:
+            factor()
+            x = opstack.pop()
+            opstack.push(1)
+            return
+        elif ic == LParen:
+            expression()
+            if checkic(RParen):
+                return
+            raise Exception(errmsg0 + str(_line + 1))
+        elif ic == Lvar:
+            x = getLvar()
+            opstack.push(1)
+            return
+        elif ic == Gvar:
+            x = getGvar()
+            opstack.push(1)
+            return
+        elif ic == Dvar: #99
+            x = getDvar()
+            opstack.push(1)
+            return
+        elif ic == DblNum:
+            opstack.push(1)
+            ic = nextic()
+            return
+        elif ic == Fcall: #関数呼び出しはファクター
+            synChkFcall()
+            #文法チェック中には実際には関数コールはしないので
+            #適当な戻り値をプッシュしておく
+            opstack.push(1)
+        elif ic == Toint or\
+                    ic == Sin or ic == Cos or ic == Tan or\
+                    ic == Dsin or ic == Dcos or ic == Dtan:
+            #(式)を評価。文法チェック中は1をプッシュし、ポインタを進めるだけ。
+            parenExp()
+            return
+        else:
+            raise Exception(errmsg0 + str(_line + 1))
+    else:
+    #■■■このブロックは通常の実行用
+        ic = nextic()
+        if ic == -1: #行末だったらエラー
+            raise Exception(errmsg0 + str(_line + 1))
+        elif ic == Not:
+            factor()
+            x = opstack.pop()
+            if x == 0:
+                opstack.push(1)
+            else:
+                opstack.push(0)
+        elif ic == Plus or ic == Minus:
+            factor()
+            x = opstack.pop()
+            if ic == Minus:
+                opstack.push(-x)
+            else:
+                opstack.push(x)
+        elif ic == LParen:
+            expression()
+            ic = nextic() #RParenのはず
+            return
+        elif ic == Lvar:
+            x = getLvar()
+            opstack.push(x)
+            return
+        elif ic == Gvar:
+            x = getGvar()
+            opstack.push(x)
+            return
+        elif ic == Dvar:
+            x = getDvar()
+            opstack.push(x)
+            return
+        elif ic == DblNum:
+            pushVal()
+            return
+        elif ic == Fcall: #関数呼び出しはファクター
+            opstack.push(callFunc())
+            return
+        elif ic == Toint:
+            parenExp() #(式)を評価
+            opstack.push(int(opstack.pop()))
+            return
+        elif ic == Sin:
+            parenExp()
+            opstack.push(math.sin(opstack.pop()))
+            return
+        elif ic == Cos:
+            parenExp()
+            opstack.push(math.cos(opstack.pop()))
+            return
+        elif ic == Tan:
+            parenExp()
+            opstack.push(math.tan(opstack.pop()))
+            return
+        elif ic == Dsin:
+            parenExp()
+            opstack.push(math.sin(opstack.pop() * math.pi / 180))
+            return
+        elif ic == Dcos:
+            parenExp()
+            opstack.push(math.cos(opstack.pop() * math.pi / 180))
+            return
+        elif ic == Dtan:
+            parenExp()
+            opstack.push(math.tan(opstack.pop() * math.pi / 180))
+            return
+    return
