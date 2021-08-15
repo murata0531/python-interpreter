@@ -1259,3 +1259,37 @@ def expressionB() :
             return
     backlpt1()
     return
+
+##################################################################
+#   <, >, <=, >=, ==, != の混ざった式の評価 式の左から順に評価される    #
+#   例えば 「x <= y > z == w」 だと x <= y の値 s を求め、       　　 #
+#   s > z の値 t を求め、t == w の値を求める                   　 　　#
+##################################################################
+
+def expressionA() :
+    expressionB() #左のデータをプッシュ
+    ic = nextic()
+    if ic == -1 :
+        return
+    while ic == Less or ic == LessEq or ic == Great \
+                    or ic == GreatEq or ic == Equal or ic == NotEq :
+        expressionB() #右のデータをプッシュ
+        x = opstack.pop() #右
+        y = opstack.pop() #左
+        if ic == Less :
+            opstack.push(y < x)
+        elif ic == LessEq :
+            opstack.push(y <= x)
+        elif ic == Great :
+            opstack.push(y > x)
+        elif ic == GreatEq :
+            opstack.push(y >= x)
+        elif ic == Equal :
+            opstack.push(y == x)
+        elif ic == NotEq :
+            opstack.push(y != x)
+        ic = nextic()
+        if ic == -1 :
+            return
+    backlpt1()
+    return
