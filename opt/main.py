@@ -1420,3 +1420,14 @@ def getLvar() :
     dmmaddr = LTable[no].dmmaddr
     v = Dmem[GVARSIZE + dmmaddr + baseReg]
     return v
+
+####################################
+#   グローバル変数の値を取得           #
+#   行先頭の Gvar を読んだ状態でコール　#
+####################################
+
+def getGvar() :
+    no = nextic()
+    dmmaddr = GTable[no].dmmaddr
+    v = Dmem[dmmaddr]
+    return v
