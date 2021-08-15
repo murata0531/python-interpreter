@@ -1293,3 +1293,51 @@ def expressionA() :
             return
     backlpt1()
     return
+
+############################################################
+#   and, or の処理 式の評価はこのコールで始める            　    #
+#   expressionA()と同様、先頭から順に値を求めていく            　#
+#　　これから評価しようとしてる式の先頭を _lpt が指した状態でコール  #
+#　　結果は opstack にプッシュされて返る                        #
+#　　_lptが式の最後の次を指した状態で終了                        #
+############################################################
+
+def expression() :
+    expressionA()
+    ic = nextic()
+    if ic == -1 :
+        return
+    while ic == And or ic == Or :
+        expressionA()
+        x = opstack.pop()
+        y = opstack.pop()
+        if ic == And :
+            if y and x : 
+                opstack.push(1)
+            else :
+                opstack.push(0)
+        else : #ic == Or
+            if y or x: 
+                opstack.push(1)
+            else :
+                opstack.push(0)
+        ic = nextic()
+        if ic == -1 :
+            return
+    backlpt1()
+    return
+#------------------------------------------
+def pushCallPara() :
+    callParaList.append(baseReg)
+    callParaList.append(spReg)
+    callParaList.append(_line)
+    callParaList.append(_lpt)
+    callParaList.append(_fnno)
+#------------------------------------------
+def popCallPara() :
+    global baseReg, spReg, _line, _lpt, _fnno
+    _fnno = callParaList.pop()
+    _lpt = callParaList.pop()
+    _line = callParaList.pop()
+    spReg = callParaList.pop()
+    baseReg = callParaList.pop()
