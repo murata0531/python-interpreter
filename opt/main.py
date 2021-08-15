@@ -1409,3 +1409,14 @@ def callFunc() :
 
 def setLvar2(i, x) :
     Dmem[LTable[i].dmmaddr + GVARSIZE + baseReg] = x
+
+#######################################
+#   ローカル変数の値を取得              　#
+#   行先頭の Lvar を読んだ状態でコール   　#
+#######################################
+
+def getLvar() :
+    no = nextic()
+    dmmaddr = LTable[no].dmmaddr
+    v = Dmem[GVARSIZE + dmmaddr + baseReg]
+    return v
