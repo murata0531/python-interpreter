@@ -1235,3 +1235,27 @@ def term() :
             return
     backlpt1()
     return
+
+###################################################
+#   通常の式（4則、変数、関数などが混ざってもよい）の評価  #
+#   結果はopstackにプッシュされる                     #
+###################################################
+
+def expressionB() :
+    term()
+    ic = nextic()
+    if ic == -1 :
+        return
+    while ic == Plus or ic == Minus :
+        term()
+        x = opstack.pop()
+        y = opstack.pop()
+        if ic == Plus :
+            opstack.push(y+x)
+        else : #ic == Minus
+            opstack.push(y-x)
+        ic = nextic()
+        if ic == -1 :
+            return
+    backlpt1()
+    return
