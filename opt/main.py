@@ -1437,14 +1437,13 @@ def getGvar() :
 #   行先頭の Dvar を読んだ状態でコール           #
 #############################################
 
-def getDvar(): #99
+def getDvar() : #99
     idx = nextic() #DTable内のインデックス取得
     nextic() #'['
     expression() #配列のインデックスを計算
-    #2020年12月16日(水) (A)を削除、(B)(C)を挿入
     #x = $d[3 をエラーと認識させるため
     #nextic() #']'  (A)
-    if not checkic(RBracket): #(B)
+    if not checkic(RBracket) : #(B)
         raise Exception(errmsg0 + str(_line + 1)) #(C)
     x = opstack.pop()
     v = DArray[idx][int(x)]
