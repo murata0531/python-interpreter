@@ -1203,3 +1203,35 @@ def factor() :
             opstack.push(math.tan(opstack.pop() * math.pi / 180))
             return
     return
+
+##############################################
+#   term(項)の評価。結果はopstackにプッシュされる　#
+##############################################
+
+def term() :
+    factor()
+    x = opstack.pop()
+    opstack.push(x)
+    ic = nextic()
+    if ic == -1 : #続きがなければreturn
+        return
+    while ic == Mult or ic == Div\
+                or ic == IDiv or ic == Mod or ic == Pow :
+        factor()
+        x = opstack.pop()
+        y = opstack.pop()
+        if ic == Mult :
+            opstack.push(y*x)
+        elif ic == Div :
+            opstack.push(y/x)
+        elif ic == IDiv :
+            opstack.push(int(y//x))
+        elif ic == Mod :
+            opstack.push(int(y%x))
+        else : #ic == Pow
+            opstack.push(pow(y, x))
+        ic = nextic()
+        if ic == -1 :
+            return
+    backlpt1()
+    return
