@@ -1341,3 +1341,62 @@ def popCallPara() :
     _line = callParaList.pop()
     spReg = callParaList.pop()
     baseReg = callParaList.pop()
+
+############################################
+#   関数呼び出しコード（Fcall）を読んでから呼ぶ  #
+#   関数をコールして値を得る                　 #
+############################################
+
+def callFunc() :
+    global baseReg, spReg, _lpt, _fnno
+    global fEnd, fReturn
+    argStack = Stack() 
+    argStack1 = Stack() 
+    j = nextic() #Fcallの次には関数のインデックスが埋め込まれている
+    argList = FTable[j].argList
+    if not checkic(LParen) :
+        return False
+    if len(argList) == 0 :
+        if not checkic(RParen) :
+            return False
+    for i in range(len(argList)) : #コールされた関数に引数をセット
+        expression()
+        x = opstack.pop()
+        argStack.push(x)
+        if i == len(argList) - 1 :
+            ic = nextic()
+            if ic != RParen :
+                return False
+        else:
+            if not checkic(Comma) :
+                return False
+    #ここまでで引数がargStackにセットされている
+    _fnno = FTable[j].fnno
+    pushCallPara()
+    fstart = FTable[j].line
+    setlpt2(fstart + 1, 0)
+    baseReg = spReg
+    spReg = baseReg + localVarSize[FTable[j].fnno]
+    for i in range(argStack.size()) :
+        argStack1.push(argStack.pop()) #引数の順を逆転させる
+    #関数に引数を渡す
+    for i in range(len(argList)) :
+        x = argStack1.pop()
+        setLvar2(argList[i], x)
+    execBlock() #このブロックで読んだreturn, endは以降で処理
+    if fReturn == 1 :  #return はここで処理
+        fReturn = 0 #フラグをクリア
+        ic = nextic()
+        if ic == -1 : #戻り値なしのreturnだった
+            popCallPara()
+            return 1 #戻り値なしでも1を返す。
+        _lpt -= 1 #ポインタを戻す
+        expression() #戻り値を評価
+        ret = opstack.pop()
+        popCallPara()
+        return ret
+    elif fEnd == 1 : #関数の定義終了のendを読んだ
+        fEnd = 0 #フラグをクリア
+        popCallPara()
+        return 1 #returnなしの関数は1を返す。
+    return 0 #上位の関数には何も伝えない
