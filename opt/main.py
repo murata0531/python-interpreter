@@ -1400,3 +1400,12 @@ def callFunc() :
         popCallPara()
         return 1 #returnなしの関数は1を返す。
     return 0 #上位の関数には何も伝えない
+
+###################################################
+#   LTable[i]が指定する変数にｘを代入する          　  #
+#   baseReg, GVARSIZEに必要な値を入れておく必要がある 　#
+#   (Dmemにｘを格納する)                         　  #
+###################################################
+
+def setLvar2(i, x) :
+    Dmem[LTable[i].dmmaddr + GVARSIZE + baseReg] = x
