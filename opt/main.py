@@ -1475,3 +1475,31 @@ def setDvar() :
     elif ic == DivEq : #/=
         DArray[idx][int(x)] = DArray[idx][int(x)] / opstack.pop()
     return
+
+######################################################
+#   変数（グローバル・ローカル）への代入文の実行        　　 #
+#   変数（割り当てメモリ）へ右辺の評価結果を格納        　　 #
+#   行先頭の Lvar か Gvar を読み、それを引数にしてコール 　 #
+#   kdはLvarかGvar                                　　#
+######################################################
+
+def setVar(kd) :
+    no = nextic()
+    if kd == Lvar :
+        #Dmem[addr]が問題の変数の本体
+        addr = baseReg + LTable[no].dmmaddr + GVARSIZE
+    elif kd == Gvar :
+        addr = GTable[no].dmmaddr #Dmem[addr]が問題の変数の本体
+    ic = nextic()
+    expression() #右辺の評価
+    if ic == Assign : #通常の代入文
+        Dmem[addr] = opstack.pop()
+    elif ic == PlusEq :
+        Dmem[addr] = Dmem[addr] + opstack.pop()
+    elif ic == MinusEq :
+        Dmem[addr] = Dmem[addr] - opstack.pop()
+    elif ic == MultEq :
+        Dmem[addr] = Dmem[addr] * opstack.pop()
+    elif ic == DivEq :
+        Dmem[addr] = Dmem[addr] / opstack.pop()
+    return addr
