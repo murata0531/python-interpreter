@@ -1503,3 +1503,14 @@ def setVar(kd) :
     elif ic == DivEq :
         Dmem[addr] = Dmem[addr] / opstack.pop()
     return addr
+
+#########################
+#   中間コードを実行する   #
+#########################
+
+def execute() :
+    global fExit
+    setlpt2(0, 0)
+    fExit = 0 #終了フラグをクリア
+    while fExit == 0 and _line < len(InterCode) :
+        statement()
