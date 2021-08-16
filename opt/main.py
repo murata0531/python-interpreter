@@ -1628,3 +1628,36 @@ def getStrNum() :
         if ic == -1 :
             return s
     raise Exception(errmsg0 + str(_line + 1))
+
+###########################################################
+#input "文字列", x の処理
+#input を読んでからコールする。xにインプットされた値を代入する
+###########################################################
+def inputProc(line):
+    global DArray
+    s = 'INPUTBOX'
+    ic = nextic()
+    if ic == Str: #input box のタイトル
+        sno = nextic() #文字列の登録インデックス
+        s = STable[sno] #表示文字列の取得
+        nextic() #カンマ読み捨て
+        ic = nextic() #LvarかGvarかDvar
+    no = nextic() #変数の登録インデックス
+    #数値の入力にはtkinterモジュールのsimpledialogを用いる
+    wd = tk.Tk()
+    wd.withdraw() #小さなウィンドウを消す
+    try:
+        x = float(sd.askstring(s, s, initialvalue=''))
+    except Exception as e: #数値に変換できなければエラー
+        print(e)
+        sys.exit()
+    if ic == Dvar:
+        bracketExp() #[xxx]の並びであることを確認し、xxx(インデックス)をスタックに積む
+        DArray[no][int(opstack.pop())] = x
+        return
+    if ic == Lvar:
+        addr = baseReg + LTable[no].dmmaddr + GVARSIZE
+    else: #ic == Gvar
+        addr = GTable[no].dmmaddr
+    Dmem[addr] = x #Dmem[addr]が変数の本体
+    return
