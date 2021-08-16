@@ -1535,3 +1535,64 @@ def execBlock() :
         if fElif == 1 or fElse == 1 or fEnd == 1 :
             break
     return
+
+#############################
+#   1行、中間コードを実行する   #
+#############################
+
+def statement() :
+    global fExit, fReturn, fEnd, fBreak, fElif, fElse
+    ic = nextic()
+    if ic == Elif :
+        fElif = 1
+    elif ic == Else :
+        fElse = 1
+    elif ic == Lvar : #代入文
+        setVar(Lvar)
+        incLine() #次の行へポインタを進める
+    elif ic == Gvar :
+        setVar(Gvar)
+        incLine()
+    elif ic == Dvar : #配列変数への代入文
+        setDvar()
+        incLine()
+    elif ic == For :
+        ed = nextic()
+        b, stp, addr = forLineProc(_line)
+        execForBlock(_line, ed, b, stp, addr)
+        return
+    elif ic == Fcall :
+        callFunc()
+        incLine()
+    elif ic == Print :
+        s = getStrNum()
+        print(s) 
+        incLine()
+    elif ic == While :
+        ln = nextic() #endのアドレス
+        execWhileBlock(_line, ln)
+        return
+    elif ic == If :
+        execIfBlock()
+        return
+    elif ic == Exit :
+        fExit = 1 #終了フラグ立てる
+        return
+    elif ic == End :
+        fEnd = 1
+        return
+    elif ic == Break :
+        fBreak = 1
+        return
+    elif ic == Return : #statement()
+        fReturn = 1
+        return
+    elif ic == Func :
+        ic = nextic() #関数定義の終了行
+        setlpt2(ic + 1, 0)
+    elif ic == Comment or ic == Dim: #コメント行、配列の定義行は実行しない
+        incLine()
+    elif ic == Input :
+        inputProc(_line)
+        incLine()
+    return
