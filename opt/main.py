@@ -1448,3 +1448,30 @@ def getDvar() : #99
     x = opstack.pop()
     v = DArray[idx][int(x)]
     return v
+
+##############################################
+#   配列変数（グローバル）への代入文の実行         #
+#   変数（割り当てメモリ）へ右辺の評価結果を格納    #
+#   行先頭の Dvar を読んだ状態でコール       　　 #
+##############################################
+
+def setDvar() :
+    global DArray
+    idx = nextic()
+    nextic() #'['
+    expression()
+    x = opstack.pop()
+    nextic() #']'
+    ic = nextic()
+    expression() #右辺の評価
+    if ic == Assign : #通常の代入文
+        DArray[idx][int(x)] = opstack.pop()
+    elif ic == PlusEq : #+=
+        DArray[idx][int(x)] = DArray[idx][int(x)] + opstack.pop()
+    elif ic == MinusEq : #-=
+        DArray[idx][int(x)] = DArray[idx][int(x)] - opstack.pop()
+    elif ic == MultEq : #*=
+        DArray[idx][int(x)] = DArray[idx][int(x)] * opstack.pop()
+    elif ic == DivEq : #/=
+        DArray[idx][int(x)] = DArray[idx][int(x)] / opstack.pop()
+    return
