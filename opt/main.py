@@ -1596,3 +1596,35 @@ def statement() :
         inputProc(_line)
         incLine()
     return
+
+####################################################
+#   文字列、式のカンマ区切りの任意個の並びから文字列を作る  #
+#   式は評価後の値を文字列に                       　　 #
+#   _lptが式や文字列の先頭を指した状態でコール  　　　　   #
+#   "こんにちは", 2*x + f(5), "やっほ" から          　#
+#   'こんにちは 18 やっほ' という文字列を作る       　　　#
+#   実行時にこれを使ってprintの引数のチェックをする   　　 #
+####################################################
+
+def getStrNum() :
+    s = ''
+    ic = nextic()
+    if ic == Str :
+        no = nextic()
+        s = STable[no]
+        ic = nextic()              
+        if ic == -1 : #文字列の表示のみ
+            return s #文字列を返す
+        elif ic != Comma :
+            raise Exception(errmsg0 + str(_line + 1))
+    else :
+        backlpt1()
+        ic = Comma
+    while ic == Comma :
+        expression()
+        x = opstack.pop()
+        s += '  ' + str(x)
+        ic = nextic()
+        if ic == -1 :
+            return s
+    raise Exception(errmsg0 + str(_line + 1))
