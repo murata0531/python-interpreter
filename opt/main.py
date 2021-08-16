@@ -1514,3 +1514,24 @@ def execute() :
     fExit = 0 #終了フラグをクリア
     while fExit == 0 and _line < len(InterCode) :
         statement()
+
+#####################################################################
+#   ブロックを実行する                                                 #
+#   関数ブロック、if文、while文、for文                                  #
+#   statement()の実行で各フラグがセットされる                            #
+#   if文関係のフラグは、それを見たらこのルーチンからすぐ戻る                 #
+#   このルーチンがif文のブロックに使われている場合は、このif文以外の          #
+#   elif, else, end は読まない                                  　    #
+#   例) ifブロック内に書かれたwhileブロックのendはwhileブロック内で読まれる  #
+#                                                                   #
+#   ifブロックでelifなどを読んだらここからはすぐに抜け、              　    #
+#   ひとつ上位のexecIfBlock()（本ルーチン）からはすぐに抜ける          　　 #
+#   さらにひとつ上位のexecIfBlock()内で処理される　　　　　　　　　　　　　 　#
+#####################################################################
+
+def execBlock() :
+    while fExit == 0 and fReturn == 0 and fBreak == 0 :
+        statement()
+        if fElif == 1 or fElse == 1 or fEnd == 1 :
+            break
+    return
