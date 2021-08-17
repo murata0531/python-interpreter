@@ -1662,3 +1662,26 @@ def inputProc(line) :
         addr = GTable[no].dmmaddr
     Dmem[addr] = x #Dmem[addr]が変数の本体
     return
+
+#################################
+#   for文から必要な情報を取り出す   #
+#################################
+
+def forLineProc(line) :
+    setlpt2(line, 3) #Lvar, Gvarの次を指す
+    if lookIc(line, 2) == Lvar :
+        addr = setVar(Lvar) #Dmem[addr]が制御変数の本体
+    elif lookIc(line, 2) == Gvar :
+        addr = setVar(Gvar) #Dmem[addr]が制御変数の本体
+    else :
+        return False
+    if checkic(To) == False :
+        return False
+    expression() #_lptは式のすぐ次を指した状態で実行を終わる
+    b = opstack.pop()
+    if checkic(Step) == False : #step がないなら
+        stp = 1
+    else : #stepあり
+        expression()
+        stp = opstack.pop()
+    return b, stp, addr #Dmem[addr]が制御変数の本体
