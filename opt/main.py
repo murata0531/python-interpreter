@@ -1715,9 +1715,9 @@ def execForBlock(st, ed, b, stp, addr) :
         if fBreak == 1 :
             fBreak = 0
             setlpt2(ed + 1, 0) #break文の次のアドレス
-            return #for文は抜ける。
+            return #for文は抜ける
         elif fReturn == 1 :
-            return #フラグはいじらない。for文は抜ける。
+            return #フラグはいじらない for文は抜ける
     setlpt2(ed + 1, 0) #forブロックを抜けるときのジャンプ先
     return #for文は抜ける
 
@@ -1745,7 +1745,76 @@ def execWhileBlock(st, ed) :
                 setlpt2(ed + 1, 0) #whileに対応するendのアドレス
                 return #実行中のwhile文は終わり
             elif fReturn == 1 :
-                return #フラグはそのまま。while文は終わり。
+                return #フラグはそのまま while文は終わり
         else : #条件不成立
             setlpt2(ed + 1, 0) #whileループのend行の次へ(ループを抜ける)
-            return #実行中のwhile文は終わり。
+            return #実行中のwhile文は終わり
+
+#########################################################
+#   ifブロックの実行                         　　   　　　  #
+#   st:ブロック開始行(if, elif, else)                 　　 #
+#   ed:ブロック終了行(elif, else, end)                　　 #
+#                                                  　　　#
+#   ifブロック内で読んだelif, else, end はここで始末する  　  #
+#########################################################
+
+def execIfBlock() :
+    global fEnd, fElif, fElse
+    ed = lookIc(_line, 1) #ifの次のelifかelseかend
+    ifend = lookIc(_line, 2) #ifに対応するend
+    setlpt2(_line, 3) #条件の書いてあるところ
+    expression() #条件式の評価
+    ret = opstack.pop()
+    if ret > 0 : #条件成立
+        setlpt2(_line + 1, 0)
+        execBlock() #ifブロック実行
+        if fElif == 1 or fElse == 1 or fEnd == 1 :
+            fElif = 0
+            fElse = 0
+            fEnd = 0
+            setlpt2(ifend + 1, 0)
+            return 0 #if文の実行終了
+        elif fReturn == 1 or fBreak == 1 :
+            return #フラグはいじらない if文は終わり
+        return
+    #ifで条件不成立だった
+    cd = lookIc(ed, 0)
+    while cd == Elif : #ここはフラグでは判定できない
+        ln = ed
+        ed = lookIc(ln, 1) #ifの次のelifかelseかend
+        ifend = lookIc(ln, 2) #if文の最後のend
+        setlpt2(ln, 3) #条件の書いてあるところ
+        expression() #条件式の評価
+        ret = opstack.pop()
+        if ret > 0 : #条件成立
+            setlpt2(ln + 1, 0)
+            execBlock() #ifブロック実行
+            if fElif == 1 or fElse == 1 or fEnd == 1 :
+                fElif = 0
+                fElse = 0
+                fEnd = 0
+                setlpt2(ifend + 1, 0)
+                return #if文の実行終了
+            elif fReturn == 1 or fBreak == 1 :
+                return #フラグはいじらない。if文は終わり。
+            return
+        #条件不成立
+        cd = lookIc(ed, 0)
+    if cd == Else : #ここはフラグでは判定できない
+        ln = ed
+        ed = lookIc(ln, 1) #ifの次のelifかelseかend
+        ifend = lookIc(ln, 2) #if文の最後のend
+        setlpt2(ln + 1, 0)
+        execBlock() #ifブロック実行
+        if fElif == 1 or fElse == 1 or fEnd == 1 :
+            fElif = 0
+            fElse = 0
+            fEnd = 0
+            setlpt2(ed + 1, 0)
+            return #if文の実行終了
+        elif fReturn == 1 or fBreak == 1 :
+            return #フラグはいじらない。if文は終わり。
+        return
+    else : #cd = End
+        setlpt2(ed + 1, 0)
+        return
