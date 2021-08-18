@@ -1685,3 +1685,38 @@ def forLineProc(line) :
         expression()
         stp = opstack.pop()
     return b, stp, addr #Dmem[addr]が制御変数の本体
+
+#################################################################
+#   forブロックの実行                                            　#
+#   for文の行を読んだ直後に実行される           　 　                 #
+#   st:    条件の書いてある行(while の行)                           #
+#   ed:    end行                                         　      #
+#   b:     制御変数がb以下（以上）なら実行       　　                 #
+#   stp:   for文のstep                                           #
+#   addr:  Dmem[addr]が制御変数の本体               　　　  　　　   #
+#                                                      　     　 #
+#   forブロックで直に読まれたreturnは                            　　#
+#   for文（ブロックを含めて）を包んでいる関数の定義にあるreturnのはず　   #
+#   だからfReturnフラグはいじらず、上位のルーチンであるcallFunc()内で　　#
+#   fReturn = 0 とする                                           #
+#   各フラグには担当のルーチンがあり,そこでクリアする                   #
+#################################################################
+
+def execForBlock(st, ed, b, stp, addr) :
+    global fBreak, fEnd
+    setlpt2(st + 1, 0)
+    while (stp > 0 and Dmem[addr] <= b) or (stp < 0 and Dmem[addr] >= b) :
+        execBlock()
+        if fEnd == 1 : #for文のend以外にはあり得ない
+            fEnd = 0
+            setlpt2(st + 1, 0) #forブロックの最初の行へ戻る
+            Dmem[addr] = Dmem[addr] + stp #制御変数にstpを加える 
+            continue #ループを続ける
+        if fBreak == 1 :
+            fBreak = 0
+            setlpt2(ed + 1, 0) #break文の次のアドレス
+            return #for文は抜ける。
+        elif fReturn == 1 :
+            return #フラグはいじらない。for文は抜ける。
+    setlpt2(ed + 1, 0) #forブロックを抜けるときのジャンプ先
+    return #for文は抜ける
