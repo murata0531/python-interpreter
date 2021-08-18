@@ -1720,3 +1720,32 @@ def execForBlock(st, ed, b, stp, addr) :
             return #フラグはいじらない。for文は抜ける。
     setlpt2(ed + 1, 0) #forブロックを抜けるときのジャンプ先
     return #for文は抜ける
+
+######################################
+#   whileブロックの実行             　　#
+#   st:条件の書いてある行(while の行)  　#
+#   ed:end行                      　　#
+#   While の行を読んだ直後に実行される　  #
+######################################
+
+def execWhileBlock(st, ed) :
+    global fBreak, fEnd
+    while True :
+        setlpt2(st, 2) #条件の書いてあるところにポインタをセット
+        expression()
+        cond = opstack.pop()
+        if cond > 0 : #条件成立なら
+            setlpt2(st + 1, 0) #while の次の行へセット
+            execBlock()
+            if fEnd == 1 :
+                fEnd = 0
+                continue
+            elif fBreak == 1 :
+                fBreak = 0
+                setlpt2(ed + 1, 0) #whileに対応するendのアドレス
+                return #実行中のwhile文は終わり
+            elif fReturn == 1 :
+                return #フラグはそのまま。while文は終わり。
+        else : #条件不成立
+            setlpt2(ed + 1, 0) #whileループのend行の次へ(ループを抜ける)
+            return #実行中のwhile文は終わり。
