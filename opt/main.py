@@ -1818,3 +1818,16 @@ def execIfBlock() :
     else : #cd = End
         setlpt2(ed + 1, 0)
         return
+
+########################################
+#   ()に囲まれた式を評価し、opstackに積む 　#
+#   左括弧を指した状態でコール             #
+########################################
+
+def parenExp() :
+    if not checkic(LParen) :
+        raise Exception(errmsg0 + str(_line + 1))
+    expression()
+    if not checkic(RParen) :
+        raise Exception(errmsg0 + str(_line + 1))
+    return
