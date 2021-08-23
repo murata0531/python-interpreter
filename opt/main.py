@@ -1844,3 +1844,21 @@ def bracketExp() :
     if not checkic(RBracket) :
         raise Exception(errmsg0 + str(_line + 1))
     return
+
+######################################
+#   文法チェック                    　 #
+#   1カ所でもエラーがあればFalseを返す　　#
+######################################
+
+def synChk() :
+    global _chkMode
+    flag = True
+    _chkMode = 1 #構文エラーチェック中フラグ
+    for line in range(len(InterCode)) :
+        try :
+            synChk1(line)
+        except Exception :
+            print((errmsg0 + str(line + 1)))
+            flag = False
+    _chkMode = 0
+    return flag
