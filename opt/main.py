@@ -1970,3 +1970,30 @@ def synChk1(line) :
         return
     else 
         raise Exception(errmsg0 + str(line + 1))
+
+############################
+#   input文の構文チェック   　#
+#   書式は             　　　#
+#    input "文字列", 変数 　 #
+#    input 変数   　　　   　#
+############################
+
+def synChkInput(line) :
+    ic = nextic()
+    if ic == Str : #input box のタイトル
+        nextic() #文字列の登録インデックスを読み捨て
+        nextic() #カンマ読み捨て
+        ic = nextic() #LvarかGvarのはず
+    if ic != Lvar and ic != Gvar and ic != Dvar :
+        raise Exception(errmsg0 + str(line + 1))
+    no = nextic() #変数の登録インデックス
+    if no < 0 :
+        raise Exception(errmsg0 + str(line + 1))
+    if ic == Lvar or ic == Gvar :
+        if nextic() != -1 : #行末でないなら
+            raise Exception(errmsg0 + str(line + 1))
+    else : #ic = Dvar
+        bracketExp() #[xxx]の並びであることを確認し、xxxを評価してスタックに積む
+        opstack.pop()
+        if nextic() != -1 :
+            raise Exception(errmsg0 + str(line + 1))
