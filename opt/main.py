@@ -1862,3 +1862,111 @@ def synChk() :
             flag = False
     _chkMode = 0
     return flag
+
+########################
+#   1行分、文法チェック   #
+########################
+
+def synChk1(line) :
+    global _lpt
+    setlpt2(line, 0)
+    ic = nextic()
+    if ic == Comment :
+        return
+    elif ic == Gvar or ic == Lvar : #代入文
+        nextic() #変数のインデックス
+        ic = nextic()
+        if ic != Assign and ic != PlusEq\
+                    and ic != MinusEq and ic != MultEq and ic != DivEq :
+            raise Exception(errmsg0 + str(line + 1))
+        expression()
+        opstack.pop()
+        ic = nextic()
+        if ic != -1 :
+            raise Exception(errmsg0 + str(line + 1))
+        return
+    elif ic == Dvar : #代入文
+        nextic() #変数のインデックス
+        if not checkic(LBracket) :
+            raise Exception(errmsg0 + str(line + 1))
+        expression() #99
+        if not checkic(RBracket) :
+            raise Exception(errmsg0 + str(line + 1))
+        ic = nextic()
+        if ic != Assign and ic != PlusEq\
+                    and ic != MinusEq and ic != MultEq and ic != DivEq :
+            raise Exception(errmsg0 + str(line + 1))
+        expression() #ここを実行して、_lptはどこを指すか？
+        opstack.pop()
+        ic = nextic()
+        if ic != -1 :
+            raise Exception(errmsg0 + str(line + 1))
+        return
+    elif ic == For :
+        nextic()
+        cd = nextic()
+        if cd != Lvar and cd != Gvar :
+            raise Exception(errmsg0 + str(line + 1))
+        nextic()
+        if not checkic(Assign) :
+            raise Exception(errmsg0 + str(line + 1))
+        expression()
+        if not checkic(To) :
+            raise Exception(errmsg0 + str(line + 1))
+        expression()
+        cd = nextic()
+        if cd == -1 :
+            return
+        if cd != Step :
+            raise Exception(errmsg0 + str(line + 1))
+        expression()
+        if checkic(-1) :
+            return
+        raise Exception(errmsg0 + str(line + 1))
+    elif ic == While :
+        nextic()
+        expression()
+        if checkic(-1) :
+            return
+        raise Exception(errmsg0 + str(line + 1))
+    elif ic == Return :
+        cd = nextic()
+        if cd == -1 :
+            return
+        _lpt -= 1
+        expression()
+        cd = nextic()
+        if cd == -1 :
+            return
+        raise Exception(errmsg0 + str(line + 1))
+    elif ic == Exit or ic == End :
+        if len(InterCode[line]) == 1 :
+            return
+    elif ic == Break :
+        if len(InterCode[line]) == 2 :
+            return
+    elif ic == If :
+        nextic()
+        nextic()
+        expression()
+        if checkic(-1) :
+            return
+        raise Exception(errmsg0 + str(line + 1))
+    elif ic == Else or ic == Elif :
+        if len(InterCode[line]) == 3 :
+            return
+    elif ic == Func :
+        return synChkFunc()
+    elif ic == Print :
+        return chkPrintArg()
+    elif ic == Fcall : #関数のサブルーチン的用法
+        synChkFcall()
+        if not checkic(-1) :
+            raise Exception(errmsg0 + str(line + 1))
+    elif ic == Input :
+        synChkInput(line)
+        return
+    elif ic == Dim : #配列の宣言は、dimのみ中間コードに変換する
+        return
+    else 
+        raise Exception(errmsg0 + str(line + 1))
