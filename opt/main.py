@@ -2064,3 +2064,31 @@ def synChkFcall() :
             raise Exception(errmsg0 + str(_line + 1))
         if ic != Comma :
             raise Exception(errmsg0 + str(_line + 1))
+        
+###################################
+#   Func を読み終わってからコール     #
+#   関数定義の書式が正しいかチェック   #
+###################################
+
+def synChkFunc() :
+    global _lpt
+    nextic()
+    nextic()
+    if not checkic(LParen) :
+        return False
+    if checkic(RParen) :
+        if checkic(-1): 
+            return True
+        return False
+    _lpt -= 1
+    cd = Comma
+    while cd == Comma :
+        if not checkic(Lvar) :
+            return False
+        nextic()
+        cd = nextic()
+        if cd == RParen : #末尾のチェック
+            if checkic(-1) :
+                return True
+            return False
+    return False
