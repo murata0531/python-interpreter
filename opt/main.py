@@ -2022,3 +2022,17 @@ def chkPrintArg() :
         if chkExpSeq() :
             return
         raise Exception(errmsg0 + str(_line + 1))
+
+####################################################################
+#   a+1, x, 56 などのカンマで区切られた1個以上の式の並びであることをチェック #
+####################################################################
+
+def chkExpSeq() :
+    cd = Comma
+    while cd == Comma :
+        expression()
+        opstack.pop()
+        cd = nextic()
+        if cd == -1 : #末尾のチェック
+            return True
+    return False
