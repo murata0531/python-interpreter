@@ -2036,3 +2036,31 @@ def chkExpSeq() :
         if cd == -1 : #末尾のチェック
             return True
     return False
+
+#######################################
+#   Fcall を読み終わってからコール        #
+#   関数呼び出しの書式が正しいかチェック    #
+#######################################
+
+def synChkFcall() :
+    no = nextic() #関数のインデックス
+    if not checkic(LParen) :
+        raise Exception(errmsg0 + str(_line + 1))
+    argNum = len(FTable[no].argList)
+    if argNum == 0 : #引数なしの関数のとき
+        if not checkic(RParen) :
+            raise Exception(errmsg0 + str(_line + 1))
+        return
+    #引数は1個以上
+    i = 0
+    while True :
+        expression()
+        opstack.pop()
+        i += 1
+        ic = nextic()
+        if ic ==  RParen :
+            if i == argNum :
+                return
+            raise Exception(errmsg0 + str(_line + 1))
+        if ic != Comma :
+            raise Exception(errmsg0 + str(_line + 1))
