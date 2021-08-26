@@ -1997,3 +1997,28 @@ def synChkInput(line) :
         opstack.pop()
         if nextic() != -1 :
             raise Exception(errmsg0 + str(line + 1))
+
+#-----------------------------------------------------
+
+def chkPrintArg() :
+    global _lpt
+    cd = nextic()
+    if cd == -1 :
+        raise Exception(errmsg0 + str(_line + 1))
+    if cd == Str :
+        if checkic(-1) : #行末なら誤り
+            raise Exception(errmsg0 + str(_line + 1))
+        if checkic(-1) : #行末なら正しい
+            return
+        _lpt -= 1
+        if not checkic(Comma) :
+            raise Exception(errmsg0 + str(_line + 1))
+        #カンマがあった
+        if not chkExpSeq() :
+            raise Exception(errmsg0 + str(_line + 1))
+        return
+    else : #引数は式で始まるはず
+        _lpt -= 1
+        if chkExpSeq() :
+            return
+        raise Exception(errmsg0 + str(_line + 1))
