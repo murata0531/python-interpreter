@@ -2137,3 +2137,38 @@ def checkFunc() :
             _line += 1
             return
         _line += 1
+
+####################################################################
+#   InterCodeを走査して、while, for文（ブロックを含む）に             　 #
+#   return, if, elif, else, endが構文上おかしな位置にないか、気に確認    #
+####################################################################
+
+def checkIf() :
+    global _line
+    _line += 1
+    if _line >= len(InterCode) :
+       raise Exception(errmsg0 + str(_line + 1))
+    ic = nextic()
+    while _line < range(len(InterCode)) :
+        ic = InterCode[_line][0]
+        if ic == If or ic == While or ic == For :
+            checkIfEtc(ic)
+        elif ic == Else :
+            _line += 1
+            break
+        elif ic == End :
+            _line += 1
+            return
+        elif ic == Func :
+            raise Exception(errmsg0 + str(_line + 1))
+        _line += 1
+    while _line < range(len(InterCode)) :
+        ic = InterCode[_line][0]
+        if ic == If or ic == While or ic == For :
+            checkIfEtc(ic)
+        elif ic == Elif or ic == Else :
+            raise Exception(errmsg0 + str(_line + 1))
+        elif ic == End :
+            _line += 1
+            return
+        _line += 1 
