@@ -2171,4 +2171,14 @@ def checkIf() :
         elif ic == End :
             _line += 1
             return
-        _line += 1 
+        _line += 1
+
+#---------------------------
+
+def checkIfEtc(ic) :
+    if ic == If :
+        checkIf()
+    elif ic == While or ic == For :
+        checkWhileFor()
+    elif ic == Func :
+        checkFunc()
