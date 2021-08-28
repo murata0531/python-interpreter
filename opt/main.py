@@ -2182,3 +2182,16 @@ def checkIfEtc(ic) :
         checkWhileFor()
     elif ic == Func :
         checkFunc()
+
+#---------------------------
+#if-elif-else-end, while-end, for-end, func-end
+#の対応などチェック
+#
+def checkSource():
+    global _line
+    if _line >= len(InterCode):
+       raise Exception(errmsg0 + str(_line + 1))
+    while _line < range(len(InterCode)):
+        ic = InterCode[_line][0]
+        if ic ==  While or ic == For or ic == If or ic == Func:
+            checkIfEtc(ic)
