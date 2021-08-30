@@ -21,7 +21,7 @@ _lpt = 0 #行内のポインタ
 InterCode = [] #中間コード
 GVARSIZE = 0
 MEMSIZE = 2 ** 10
-Dmem = [0.0] **MEMSIZE #メインメモリの確保
+Dmem = [0.0] * MEMSIZE #メインメモリの確保
 errmsg0 = '構文エラー 行 = '
 _fnno = 0 #実行中の関数の番号
 fExit = 0
@@ -222,7 +222,7 @@ class Stack :
     def size(self) :
         return len(self.stack)
 
-opstack = stack() # 数式評価用のオペランドスタック
+opstack = Stack() # 数式評価用のオペランドスタック
 
 ###########################################
 #     文字列の登録を確認する                  #
@@ -1968,7 +1968,7 @@ def synChk1(line) :
         return
     elif ic == Dim : #配列の宣言は、dimのみ中間コードに変換する
         return
-    else 
+    else :
         raise Exception(errmsg0 + str(line + 1))
 
 ############################
@@ -2263,7 +2263,7 @@ try :
 except Exception as e :
     print(e)
     sys.exit()
-    
+
 dt = datetime.datetime.now()
 print('■■■ {}:{}:{}'.format(dt.hour, dt.minute, dt.second))
 sys.exit()
