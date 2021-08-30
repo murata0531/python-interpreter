@@ -2195,3 +2195,23 @@ def checkSource() :
         ic = InterCode[_line][0]
         if ic ==  While or ic == For or ic == If or ic == Func :
             checkIfEtc(ic)
+
+#---------------------------
+
+def printTkn(tkn) :
+        print('kind = {}\nval = {}\nname = {}\n'.format(tkn.kind, tkn.val, tkn.name))
+
+#---------------------------
+
+def printInterCode() :
+    for i in range(len(InterCode)) :
+        for j in range(len(InterCode[i])) :
+            print(i, InterCode[i][j])
+
+#---------------------------
+
+def printDmmaddr() :
+    for i in range(len(LTable)) :
+        print(i, 'name, fnno, dmmaddr = ', LTable[i].name, LTable[i].fnno, LTable[i].dmmaddr)
+    for i in range(len(GTable)) :
+        print(i, 'name, fnno, dmmaddr = ', GTable[i].name, GTable[i].fnno, GTable[i].dmmaddr)
