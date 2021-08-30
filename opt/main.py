@@ -2215,3 +2215,55 @@ def printDmmaddr() :
         print(i, 'name, fnno, dmmaddr = ', LTable[i].name, LTable[i].fnno, LTable[i].dmmaddr)
     for i in range(len(GTable)) :
         print(i, 'name, fnno, dmmaddr = ', GTable[i].name, GTable[i].fnno, GTable[i].dmmaddr)
+
+
+#■■■■■■■■■■■■■■■■■■■■■■■■■■■
+#           メイン
+#■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+
+#fname = "======qsort.txt" #99
+dt = datetime.datetime.now()
+print('■■■ {}:{}:{}'.format(dt.hour, dt.minute, dt.second))
+print('__file__ = ', __file__)
+path, b = os.path.split(__file__)
+#os.sepはosによって異なるパスの区切り記号
+print('path + os.sep + fname = ', path + os.sep + fname)
+sys.tracebacklimit = 10000
+
+try:
+    source = readSource(path + os.sep + fname)
+except Exception :
+    print('ファイルの読み取りエラー')
+    sys.exit()
+
+splt = os.linesep #osによって異なる改行コードを得る
+getLines(splt)
+getFnnoList() #各行のfnnoがfnnoListに入る
+registDvar() #配列変数の登録
+
+try :
+    toInterCode()
+    getLocalVarSize()
+    baseReg = 0
+    spReg = GVARSIZE + localVarSize[0]
+    posChk()
+    setStartEndAddr()
+    setIfAddr()
+    setBreakAddr()
+    returnBreakChk()
+    #print("■■■■■")
+    #printInterCode()
+    #print("■■■■■")
+    #printDmmaddr()
+    ret = synChk()
+    if not ret :
+        sys.exit()
+    execute()
+except Exception as e :
+    print(e)
+    sys.exit()
+    
+dt = datetime.datetime.now()
+print('■■■ {}:{}:{}'.format(dt.hour, dt.minute, dt.second))
+sys.exit()
