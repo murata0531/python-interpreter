@@ -70,23 +70,3 @@ To access the server, open this file in a browser:
  ブラウザで `http://127.0.0.1:7777` にアクセス(今回はポート番号7777にしているが、特に指定はない)
  
  Token authentication is enabledというページが出るので、そこに上のメッセージでtoken=に続くコードをコピーしてPassword or tokenの入力欄に入力してLog inボタンを押す
-
-
-{
-    "404": "The API call you tried to make was not defined. Here's a definition of the API to help you get going :)",
-    "documentation": {
-        "handlers": {
-            "/ie4a01": {
-                "GET": {
-                    "examples": [
-                        "http://localhost:8000/ie4a01"
-                    ],
-                    "outputs": {
-                        "format": "JSON (Javascript Serialized Object Notation)",
-                        "content_type": "application/json; charset=utf-8"
-                    }
-                }
-            }
-        }
-    }
-}
